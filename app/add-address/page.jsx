@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useState } from "react";
 
 const AddAddress = () => {
+    const { getToken, router } = useAppContext();
 
     const [address, setAddress] = useState({
         fullName: '',
@@ -18,6 +19,20 @@ const AddAddress = () => {
 
     const onSubmitHandler = async (e) => {
         e.preventDefault();
+        try {
+            const token = await getToken();
+            const { data } = await axios.post('/api/address/add-address', { address }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (data.success) {
+                toast.success(data.message);
+                router.push('/cart');
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
 
     }
 
